@@ -2,6 +2,7 @@
   (:require [adzerk.statsd-client :refer :all]
             [clojure.test :refer :all]))
 
+;; Formatting
 (def fincrement (comp base-formatter increment))
 (def fdecrement (comp base-formatter decrement))
 (def ftimer     (comp base-formatter timer))
@@ -42,6 +43,17 @@
   (is (= (funique :metric.name "xyz")       "metric.name:xyz|s"))
   (is (= (funique :metric.name 1 :rate 0.3) "metric.name:1|s|@0.3")))
 
+;; Custom formatter
+(defn categories [f]
+  (fn [opts]
+    (str (f opts) "|#" (:categories opts))))
+(def custom-formatter (categories base-formatter))
+(def cfincrement (comp custom-formatter increment))
+
+(deftest increment-categories-format
+  (is (= (cfincrement :metric.name 1 :categories "a,b,c") "metric.name:1|c|#a,b,c")))
+
+;; Sending messages
 (use-fixtures :each (fn [f] (setup "localhost" 8125) (f)))
 
 (defmacro should-send-expected-stat
