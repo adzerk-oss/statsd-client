@@ -1,5 +1,5 @@
-(ns statsd-client.core-test
-  (:require [statsd-client.core :refer :all]
+(ns adzerk.statsd-client-test
+  (:require [adzerk.statsd-client :refer :all]
             [clojure.test :refer :all]))
 
 (def fincrement (comp base-formatter increment))

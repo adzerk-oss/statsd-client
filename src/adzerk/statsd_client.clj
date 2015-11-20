@@ -1,4 +1,4 @@
-(ns statsd-client.core
+(ns adzerk.statsd-client
   (:import [java.util Random])
   (:import [java.net DatagramPacket DatagramSocket InetAddress]))
 
