@@ -74,14 +74,14 @@
 
 (defn rate [f]
   (fn [{:keys [rate] :as x}]
-    (if rate
-      (format "%s|@%f" (f x) rate)
+    (if (and rate (not= rate 1.0))
+      (format "%s|@%s" (f x) rate)
       (f x))))
 
-(def format-base (-> metric-name value metric-type rate))
+(def base-formatter (-> metric-name value metric-type rate))
 
 ;; metrics
-(defn base-vals [mt k v r x] (merge {:mt mt :k k :v v :r r} x))
+(defn base-vals [mt k v r x] (merge {:mt mt :k k :v v :rate r} x))
 
 (defmacro defmetric
   "Captures commonalities among the metric functions"
