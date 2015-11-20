@@ -109,7 +109,7 @@
   with a 1.0 rate"
   ([metric-name]                    (increment metric-name -1))
   ([metric-name value]              (increment metric-name (* -1 value)))
-  ([metric-name value & {:as opts}] (increment metric-name (* -1 value) opts)))
+  ([metric-name value & opts] (apply increment metric-name (* -1 value) opts)))
 
 (defmetric timer
   "Time an event at specified rate, defaults to 1.0 rate"
@@ -125,3 +125,26 @@
    signature here because that wouldn't make much sense."
   [metric-name value & {:as opts}]
   (base-vals :set metric-name value opts))
+
+;; timing
+(defmacro with-sampled-timing
+  "Time the execution of the provided code, with sampling."
+  [publish metric-name rate & body]
+  `(let [start# (System/currentTimeMillis)
+         result# (do ~@body)]
+     (~publish (timer ~metric-name (- (System/currentTimeMillis) start#) :rate ~rate))
+    result#))
+
+(defmacro with-timing
+  "Time the execution of the provided code."
+  [publish metric-name & body]
+  `(with-sampled-timing ~publish ~metric-name 1.0 ~@body))
+
+;; conveniently packaged defaults
+(def publish-base (partial publish base-formatter))
+
+(def increment!   (comp publish-base increment))
+(def decrement!   (comp publish-base decrement))
+(def timer!       (comp publish-base timer))
+(def gauge!       (comp publish-base gauge))
+(def unique!      (comp publish-base unique))
