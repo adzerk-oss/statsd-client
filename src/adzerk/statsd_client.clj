@@ -2,6 +2,11 @@
   (:import [java.util Random])
   (:import [java.net DatagramPacket DatagramSocket InetAddress]))
 
+
+;;----
+;; Publishing
+;;----
+
 (def
   ^{:doc "Atom holding the socket configuration"}
   cfg
@@ -53,8 +58,12 @@
       (or (>= rate 1.0)
           (<= (.nextDouble ^Random (:random @cfg)) rate)) (send-stat content))))
 
-;; value formatters - metric-name, value, metric-type, rate follow
+;;----
+;; value formatters
+;;----
+;; the metric-name, value, metric-type, rate functions follow
 ;; middleware pattern with metric-name as the base case
+
 (defn metric-name [opts]
   (name (:metric-name opts)))
 
@@ -68,6 +77,7 @@
    :histogram "h"
    :timer "ms"
    :set "s"})
+
 (defn metric-type [f]
   (fn [opts]
     (str (f opts) "|" (metric-types (:metric-type opts)))))
@@ -80,7 +90,12 @@
 
 (def base-formatter (-> metric-name value metric-type rate))
 
+;;----
 ;; metrics
+;;----
+;; functions that fill in the statsd metric attributes
+;; metric-type, metric-name, and value
+
 (defn base-vals
   [metric-type metric-name value opts]
   (merge {:metric-type metric-type
@@ -126,7 +141,10 @@
   [metric-name value & {:as opts}]
   (base-vals :set metric-name value opts))
 
-;; timing
+;;----
+;; timing macros!
+;;----
+
 (defmacro with-sampled-timing
   "Time the execution of the provided code, with sampling."
   [publish metric-name rate & body]
@@ -140,7 +158,10 @@
   [publish metric-name & body]
   `(with-sampled-timing ~publish ~metric-name 1.0 ~@body))
 
-;; conveniently packaged defaults
+;;----
+;; conveniently packaged defaults!
+;;----
+
 (def publish-base (partial publish base-formatter))
 
 (def increment!   (comp publish-base increment))

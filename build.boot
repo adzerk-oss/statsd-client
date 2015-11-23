@@ -1,7 +1,7 @@
 (set-env!
  :source-paths   #{"src"}
  :resource-paths #{"resources"}
- :dependencies '[[org.clojure/clojure "1.7.0" :scope "provided"]])
+ :dependencies '[[org.clojure/clojure "1.7.0"]])
 
 (def +version+ "1.0.0")
 
