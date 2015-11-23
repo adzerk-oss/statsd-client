@@ -68,8 +68,8 @@ the metric attributes `:metric-name`, `:metric-type`, `:value`, and
 
 ```clojure
 ;; formatters return a string - this is just for demonstration purposes
-(def cfincrement (comp custom-formatter increment))
-(def cfdecrement (comp custom-formatter decrement))
+(def cfincrement (comp custom-formatter s/increment))
+(def cfdecrement (comp custom-formatter s/decrement))
 
 (cfincrement :metric.name 1 :categories ["moop" "bloop"])
 ; => "metric.name:1|c|#moop,bloop"
@@ -82,10 +82,10 @@ the metric attributes `:metric-name`, `:metric-type`, `:value`, and
 Here's how you could actually combine everything for convenience:
 
 ```clojure
-(def publish-custom (partial publish custom-formatter))
-(def increment!     (comp publish-custom increment))
-(def decrement!     (comp publish-custom decrement))
-(def timer!         (comp publish-custom timer))
-(def gauge!         (comp publish-custom gauge))
-(def unique!        (comp publish-custom unique))
+(def publish-custom (partial s/publish custom-formatter))
+(def increment!     (comp publish-custom s/increment))
+(def decrement!     (comp publish-custom s/decrement))
+(def timer!         (comp publish-custom s/timer))
+(def gauge!         (comp publish-custom s/gauge))
+(def unique!        (comp publish-custom s/unique))
 ```
