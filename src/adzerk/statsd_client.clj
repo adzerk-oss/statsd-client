@@ -64,12 +64,12 @@
 ;; the metric-name, value, metric-type, rate functions follow
 ;; middleware pattern with metric-name as the base case
 
-(defn metric-name [opts]
-  (name (:metric-name opts)))
+(defn metric-name [metric-attrs]
+  (name (:metric-name metric-attrs)))
 
 (defn value [f]
-  (fn [opts]
-    (format "%s:%s" (f opts) (:value opts))))
+  (fn [metric-attrs]
+    (format "%s:%s" (f metric-attrs) (:value metric-attrs))))
 
 (def metric-types
   {:gauge "g"
@@ -79,14 +79,14 @@
    :set "s"})
 
 (defn metric-type [f]
-  (fn [opts]
-    (str (f opts) "|" (metric-types (:metric-type opts)))))
+  (fn [metric-attrs]
+    (str (f metric-attrs) "|" (metric-types (:metric-type metric-attrs)))))
 
 (defn rate [f]
-  (fn [{:keys [rate] :as opts}]
+  (fn [{:keys [rate] :as metric-attrs}]
     (if (and rate (not= rate 1.0))
-      (format "%s|@%s" (f opts) rate)
-      (f opts))))
+      (format "%s|@%s" (f metric-attrs) rate)
+      (f metric-attrs))))
 
 (def base-formatter (-> metric-name value metric-type rate))
 
@@ -97,11 +97,11 @@
 ;; metric-type, metric-name, and value
 
 (defn base-vals
-  [metric-type metric-name value opts]
+  [metric-type metric-name value metric-attrs]
   (merge {:metric-type metric-type
           :metric-name metric-name
           :value value}
-         opts))
+         metric-attrs))
 
 (defmacro defmetric
   "Captures commonalities among the metric functions. Provides default
@@ -110,8 +110,8 @@
   `(defn ~name
      ~docstring
      ~@arities
-     ([metric-name# value# & {:as opts#}]
-      (base-vals ~metric-type metric-name# value# opts#))))
+     ([metric-name# value# & {:as metric-attrs#}]
+      (base-vals ~metric-type metric-name# value# metric-attrs#))))
 
 (defmetric increment
   "Increment a counter at specified rate, defaults to a one increment
@@ -122,9 +122,9 @@
 (defn decrement
   "Decrement a counter at specified rate, defaults to a one decrement
   with a 1.0 rate"
-  ([metric-name]                    (increment metric-name -1))
-  ([metric-name value]              (increment metric-name (* -1 value)))
-  ([metric-name value & opts] (apply increment metric-name (* -1 value) opts)))
+  ([metric-name]                      (increment metric-name -1))
+  ([metric-name value]                (increment metric-name (* -1 value)))
+  ([metric-name value & metric-attrs] (apply increment metric-name (* -1 value) metric-attrs)))
 
 (defmetric timer
   "Time an event at specified rate, defaults to 1.0 rate"
@@ -138,8 +138,8 @@
   "Send an event, unique occurences of which per flush interval
    will be counted by the statsd server. We have no rate call
    signature here because that wouldn't make much sense."
-  [metric-name value & {:as opts}]
-  (base-vals :set metric-name value opts))
+  [metric-name value & {:as metric-attrs}]
+  (base-vals :set metric-name value metric-attrs))
 
 ;;----
 ;; timing macros!

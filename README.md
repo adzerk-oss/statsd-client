@@ -43,7 +43,9 @@ because the following three steps are **DECOMPLECTED**
 
 To use your own custom format, you just need to create your own
 formatter and, optionally, write your own functions that combine the
-steps as `increment!`, `decrement!` et al. do:
+steps as `increment!`, `decrement!` et al. do.
+
+Let's write a custom formatter:
 
 ```clojure
 (ns example
@@ -51,12 +53,20 @@ steps as `increment!`, `decrement!` et al. do:
             [clojure.string :as str]))
 
 (defn categories [f]
-  (fn [opts]
-    (str (f opts) "|#" (str/join "," (:categories opts)))))
+  (fn [metric-attrs]
+    (str (f metric-attrs) "|#" (str/join "," (:categories metric-attrs)))))
 
-;; custom formatter - this follows the middleware pattern
 (def custom-formatter (categories base-formatter))
+```
 
+Formatters follow the middleware pattern. When you call `(categories
+base-formatter)`, you get a new function that expects metric
+attributes and returns a formatted string. `base-formatter` handles
+the metric attributes `:metric-name`, `:metric-type`, `:value`, and
+`:rate`. The `categories` formatter handles a new attribute,
+`:categories`. Here's how you would use it:
+
+```clojure
 ;; formatters return a string - this is just for demonstration purposes
 (def cfincrement (comp custom-formatter increment))
 (def cfdecrement (comp custom-formatter decrement))
@@ -67,9 +77,11 @@ steps as `increment!`, `decrement!` et al. do:
 ;; value of -1 instead of 1 when decrementing
 (cfdecrement :metric.name 1 :categories ["moop" "bloop"])
 ; => "metric.name:-1|c|#moop,bloop"
+```
 
+Here's how you could actually combine everything for convenience:
 
-;; here's how you could combine everything
+```clojure
 (def publish-custom (partial publish custom-formatter))
 (def increment!     (comp publish-custom increment))
 (def decrement!     (comp publish-custom decrement))
