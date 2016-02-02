@@ -1,9 +1,14 @@
 (set-env!
  :source-paths   #{"src"}
  :resource-paths #{"resources"}
- :dependencies '[[org.clojure/clojure "1.7.0"]])
+ :dependencies '[[org.clojure/clojure "1.7.0"]
+                 [adzerk/bootlaces "0.1.13" :scope "test"]])
 
-(def +version+ "1.0.0")
+(def +version+ "0.1.0")
+
+(require '[adzerk.bootlaces :refer :all])
+
+(bootlaces! +version+)
 
 (task-options!
  pom  {:project     'adzerk/statsd-client
