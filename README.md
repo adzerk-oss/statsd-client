@@ -1,4 +1,4 @@
-statsd-client is an extensible client for the
+statsd-client is an extensible client for
 [statsd](https://github.com/etsy/statsd).
 
 ## Installing
