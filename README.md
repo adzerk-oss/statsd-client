@@ -6,7 +6,7 @@ statsd-client is an extensible client for the
 Add the following to your Leiningen or Boot deps:
 
 ```clojure
-[adzerk/statsd-client "1.0.0"]
+[adzerk/statsd-client "0.1.0"]
 ```
 
 ## Usage
