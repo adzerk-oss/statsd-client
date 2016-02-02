@@ -13,7 +13,7 @@
 (task-options!
  pom  {:project     'adzerk/statsd-client
        :version     +version+
-       :description "A sweet statsd client"
+       :description "A sweet extensible statsd client"
        :url         "https://github.com/adzerk-oss/statsd-client"
        :scm         {:url "https://github.com/adzerk-oss/statsd-client"}
        :license     {"Eclipse Public License"
