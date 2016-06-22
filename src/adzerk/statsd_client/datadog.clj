@@ -7,10 +7,13 @@
   (format-tags [tags] "format the tags"))
 
 (extend-protocol FormatTags
-  clojure.lang.PersistentVector
+  nil
+  (format-tags [tags] nil)
+
+  clojure.lang.IPersistentVector
   (format-tags [tags] (str/join "," tags))
 
-  clojure.lang.PersistentArrayMap
+  clojure.lang.IPersistentMap
   (format-tags [tags] (->> tags
                            (mapv (fn [[k v]]
                                    (if (nil? v)
