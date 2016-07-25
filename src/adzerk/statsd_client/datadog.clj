@@ -16,7 +16,10 @@
                                    (if (nil? v)
                                      (name k)
                                      (str (name k) ":" v))))
-                           format-tags)))
+                           format-tags))
+
+  java.lang.Object
+  (format-tags [_] ""))
 
 (defn tags
   "Tags can be a map or vector:
