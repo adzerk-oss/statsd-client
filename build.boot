@@ -3,7 +3,7 @@
  :dependencies '[[org.clojure/clojure "1.7.0"]
                  [adzerk/bootlaces "0.1.13" :scope "test"]])
 
-(def +version+ "0.1.1")
+(def +version+ "0.1.2")
 
 (require '[adzerk.bootlaces :refer :all])
 
